@@ -1,3 +1,3 @@
-%%_gap_version 1.2.2
-%%_gap_upstream_version 1r2p2
+%%_gap_version 4.5.7
+%%_gap_upstream_version 4r5p7
 %%_gap_dir /usr/lib/gap

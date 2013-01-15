@@ -12,7 +12,7 @@
 
 Name:           gap
 Version:        %(echo %upstreamver | sed -r "s/r|p/./g")
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Computational discrete algebra
 
 Group:          Sciences/Mathematics
@@ -395,6 +395,9 @@ make testinstall
 %{_xemacs_sitelispdir}/gap*.el
 
 %changelog
+* Tue Jan 15 2013 pcpa <paulo.cesar.pereira.de.andrade@gmail.com> - 4.5.7-3
+- Correct version in macros.gap
+
 * Tue Jan 15 2013 pcpa <paulo.cesar.pereira.de.andrade@gmail.com> - 4.5.7-2
 - Rebuild after bootstrap
 
