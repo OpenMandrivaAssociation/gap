@@ -1,0 +1,44 @@
+.TH "UPDATE-GAP-WORKSPACE" "1" "July 2003" "GAP" "User Commands"
+.SH "NAME"
+update-gap-workspace \- manage a GAP workspace.
+.SH "SYNOPSIS"
+\&update-gap-workspace
+.PP
+\&update-gap-workspace update
+.IP
+Create or update the GAP workspace.
+.PP
+\&update-gap-workspace delete
+.IP
+Delete the GAP workspace.
+.SH "DESCRIPTION"
+At start up, GAP load all libraries and packages available on the system.
+This take several seconds. To save time, GAP can store the result of
+this initialisation in a `workspace'.
+.I update-gap-workspace
+help to manage such workspaces.
+.I update-gap-workspace
+can be run as root to manage the system-wide workspace.
+.I update-gap-workspace
+can be run as a normal user. In this case the workspace is stored in
+$HOME/gap/workspace.gz.
+.PP
+Note that you need to rebuild the workspace each time GAP packages are
+added, removed or updated. To automate that task, if the system-wide
+workspace exists, it is automatically updated whenever a GAP-related
+Debian package is installed or upgraded.
+.PP
+The gap script will automatically load such workspace at start up.
+.SH "FILES"
+.I /var/lib/gap/workspace.gz:
+.RS
+The system-wide GAP workspace.
+.RE
+.I $HOME/gap/workspace.gz:
+.RS
+The user-specific GAP workspace.
+.SH "SEE ALSO"
+.I gap(1),
+.I The \`SaveWorkspace' function in the GAP manual.
+.SH "AUTHOR"
+Bill Allombert <ballombe@debian.org>

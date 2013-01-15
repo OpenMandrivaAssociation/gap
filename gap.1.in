@@ -1,0 +1,123 @@
+.TH "GAP" "1" "@VERSION@" "GAP" "User Commands"
+.SH "NAME"
+gap \- Run the Groups, Algorithms and Programming system
+.SH "SYNOPSIS"
+.B gap
+[\fIOPTIONS\fP] [\fIFILES\fP]
+.SH "DESCRIPTION"
+.PP
+GAP is a system for computational discrete algebra, with particular emphasis
+on Computational Group Theory.  GAP provides a programming language, a library
+of thousands of functions implementing algebraic algorithms written in the GAP
+language as well as large data libraries of algebraic objects.  GAP is used in
+research and teaching for studying groups and their representations, rings,
+vector spaces, algebras, combinatorial structures, and more.
+.SH "OPTIONS"
+Boolean options (b, e, p, q, r, A, D, M, N, O, T, X, and Y) toggle the current
+value each time they are used.  Default actions are indicated first.
+.PP
+MEM options indicate a number of bytes.  Larger units are indicated with
+trailing characters: 'k' for kilobytes, m for megabytes, and g for gigabytes.
+For example, '512k' means 512 kilobytes.
+.TP
+\fB\-a\fP \fIMEM\fP
+Set the amount of preallocated space.
+.TP
+\fB\-b\fP
+Disable/enable the banner.
+.TP
+\fB\-c\fP \fIMEM\fP
+Set the cache size.
+.TP
+\fB\-e\fP
+Disable/enable quitting on Ctrl-D.
+.TP
+\fB\-f\fP
+Force line editing.
+.TP
+\fB\-g\fP
+Show GASMAN messages.  If this option is given once, then full garbage
+collections are shown.  If it is given twice, all garbage collections are
+shown.
+.TP
+\fB\-h\fP
+Print a help message and exit.
+.TP
+\fB\-i\fP \fIFILE\fP
+Load an alternate init file.
+.TP
+\fB\-l\fP \fIPATHS\fP
+Set the GAP root paths.  A leading semicolon means to append PATHS to the
+existing list of root paths.  A trailing semicolon means to prepend PATHS.
+Otherwise, the list of root paths is replaced with PATHS.
+.TP
+\fB\-m\fP \fIMEM\fP
+Set the initial workspace size.
+.TP
+\fB\-n\fP
+Prevent line editing.
+.TP
+\fB\-o\fP \fIMEM\fP
+Set the hint for the maximal workspace size.  GAP may allocate more.
+.TP
+\fB\-p\fP
+Enable/disable emitting extra commands to the output to tell a window handler
+what GAP is doing.
+.TP
+\fB\-q\fP
+Enable/disable quiet mode.
+.TP
+\fB\-r\fP
+Disable/enable reading of the .gaprc file.
+.TP
+\fB\-x\fP \fINUM\fP
+Set the window width to NUM columns.
+.TP
+\fB\-y\fP \fINUM\fP
+Set the window height to NUM rows.
+.TP
+\fB\-A\fP
+Disable/enable autoloading of GAP packages.
+.TP
+\fB\-B\fP \fINAME\fP
+Set the name of the current architecture.
+.TP
+\fB\-C\fP \fI<output>\fP \fI<input>\fP \fI<name>\fP
+Compile an input file with the given name into an output file.
+.TP
+\fB\-D\fP
+Enable/disable debugging the loading of library files.
+.TP
+\fB\-K\fP \fIMEM\fP
+Set the maximal workspace size.  GAP never allocates more.
+.TP
+\fB\-L\fP \fIFILE\fP
+Restore a saved workspace.
+.TP
+\fB\-M\fP
+Disable/enable loading of compiled modules.
+.TP
+\fB\-N\fP
+Disable/enable check for completion files.
+.TP
+\fB\-O\fP
+Enable/disable compatibility with GAP 3, by causing false and fail to be the
+same value.
+.TP
+\fB\-R\fP
+Prevent restoring of workspace (causes -L to be ignored).
+.TP
+\fB\-T\fP
+Disable/enable break loop.
+.TP
+\fB\-U\fP \fIOPTIONS\fP
+Set the compile options for compiling GAP files.
+.TP
+\fB\-X\fP
+Enable/disable CRC while reading completion.
+.TP
+\fB\-Y\fP
+Enable/disable CRC while completing files.
+.SH "SEE ALSO"
+.PP
+\fIgac\fP(1), \fIupdate-gap-workspace\fP(1)

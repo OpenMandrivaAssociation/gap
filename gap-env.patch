@@ -1,0 +1,27 @@
+--- ./src/system.c.orig	2012-07-16 11:27:25.000000000 -0600
++++ ./src/system.c	2012-08-14 16:40:19.470468141 -0600
+@@ -1752,6 +1752,7 @@ void InitSystem (
+     Char *              argv [] )
+ {
+     Char *              *ptrlist;
++    Char *              envvar;
+     UInt                i;             /* loop variable                   */
+     Int res;                       /* return from option processing function */
+ 
+@@ -1875,6 +1876,16 @@ void InitSystem (
+ 
+ #endif
+ 
++    /* process environment variables */
++    envvar = getenv("GAP_DIR");
++    if (envvar == NULL)
++      envvar = "/usr/lib/gap";
++    setGapRootPath(&envvar, NULL);
++    envvar = getenv("GAP_MEM");
++    if (envvar == NULL)
++      envvar = "32m";
++    storeMemory2(&envvar, &SyStorMin);
++
+     /* save the original command line for export to GAP */
+     SyOriginalArgc = argc;
+     SyOriginalArgv = argv;

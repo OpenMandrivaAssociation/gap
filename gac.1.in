@@ -1,0 +1,71 @@
+.TH "GAC" "1" "@VERSION@" "GAP" "User Commands"
+.SH "NAME"
+gac \- Compile GAP input files
+.SH "SYNOPSIS"
+.B gac
+[\fI\-d\fP] [\fI\-c|\-C\fP] [\fI\-o <output>\fP] {\fI\-f<option>\fP}
+\fI<input>\fP ...
+.SH "DESCRIPTION"
+.PP
+GAC compiles GAP input files, which must be GAP source code (suffix '.g' or
+\'.gap'), C source code (suffix '.c'), or compiled code files (suffix '.o').
+.SH "OPTIONS"
+If neither \fI\-c\fP nor \fI\-C\fP is given, then gac compiles the code
+completely, producing a new kernel for static compilation or a dynamically
+loadable '.so' file for dynamic compilation.
+.TP
+\fB\-d\fP, \fB\-\-dynamic\fP
+Compile for dynamic loading.
+.TP
+\fB\-c\fP, \fB\-\-compile\fP
+Only compile the input files to '.o' object files, which must be further
+linked to make a static kernel or dynamically loadable module.
+.TP
+\fB\-C\fP, \fB\-\-create\-c\fP
+Only compile the input files to C code, which will require compilation and
+linking to be usable.
+.TP
+\fB\-r\fP
+Statically compiled files are assumed to be given by pathnames relative to the
+GAP root, and will be compiled for automatic loading when files are sought
+relative to the GAP root.
+.TP
+\fB\-o\fP, \fB\-\-output\fP \fI<output>\fP
+Set the name of the output file.
+.TP
+\fB\-ffast\-int\-arith\fP
+Emit code for arithmetic operations which works faster if both operands are
+small integers, and slower otherwise.
+.TP
+\fB\-ffast\-plain\-lists\fP
+Emit code for list access which works faster if the list is a plain list, and
+slower otherwise.
+.TP
+\fB\-ffast\-list\-funcs\fP
+Inline the list functions 'Add' and 'Length', for a small speed boost.
+.TP
+\fB\-fno\-check\-types\fP
+Emit no error checks for element types, which improves performance but may
+result in a crash if an error happens.
+.TP
+\fB\-fno\-check\-list\-elms\fP
+Emit no error checks for list access, which improves performance but may
+result in a crash if an error happens.
+.TP
+\fB\-p\fP \fI<option>\fP
+Pass the given option to the C compiler.
+.TP
+\fB\-P\fP \fI<option>\fP
+Pass the given option to the C linker.
+.TP
+\fB\-k\fP, \fB\-\-gap\-compiler\fP \fI<path>\fP
+Use the given path to find the GAP binary, instead of the default.
+.TP
+\fB\-i\fP, \fB\-\-gap\-include\fP \fI<path>\fP
+Use the given path to find the GAP header files, instead of the default.
+.TP
+\fB\-l\fP, \fB\-\-gap\-binary\fP \fI<path>\fP
+Use the given path to find the GAP binary directory, instead of the default.
+.SH "SEE ALSO"
+.PP
+\fIgap\fP(1), \fIupdate-gap-workspace\fP(1)

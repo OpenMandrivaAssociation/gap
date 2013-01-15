@@ -1,0 +1,73 @@
+--- ./configure.orig	2012-05-21 08:42:52.000000000 -0600
++++ ./configure	2012-08-15 14:00:11.360607877 -0600
+@@ -4073,7 +4073,7 @@ $as_echo "no" >&6; }
+ fi
+ 
+ 
+-gapdir=`pwd`
++gapdir=/usr/lib/gap
+ 
+ 
+ 
+--- ./cnf/gac.in.orig	2012-03-23 09:17:36.000000000 -0600
++++ ./cnf/gac.in	2012-08-15 14:00:17.299605327 -0600
+@@ -55,16 +55,16 @@
+ ##  option is appended at the end of the link command after the .o
+ ##  files to link.
+ ##
+-gap_bin=@gapbin@
++gap_bin=/usr/include/gap
+ 
+ if [ "X${gap_bin}" = "X$0" ];  then
+     gap_dir="../../";
+     gap_compiler="./gap";
+     gap_binary="./";
+ else
+-    gap_dir="${gap_bin}/../..";
+-    gap_compiler="${gap_bin}/gap";
+-    gap_binary="${gap_bin}";
++    gap_dir=/usr/lib/gap;
++    gap_compiler=/usr/bin/gap;
++    gap_binary=${gap_dir}/bin/@gaparch@;
+ fi
+ gap_options=""
+ gap_include="${gap_dir}/src"
+@@ -119,9 +119,9 @@ gap_compile () {
+ ##
+ c_compile () {
+     echo ${c_compiler}  $3 -o $1 -I${gap_dir} \
+-         -I${gap_bin} -DCONFIG_H -c $2
++         -I${gap_bin} -I${gap_binary} -DCONFIG_H -c $2
+     ${c_compiler} $3 -o $1 -I${gap_dir} \
+-         -I${gap_bin} -DCONFIG_H -c $2 || exit 1
++         -I${gap_bin} -I${gap_binary} -DCONFIG_H -c $2 || exit 1
+ }
+ 
+ 
+@@ -385,17 +385,17 @@ make_compstat () {
+     objects="${gactmp}/$$compstat.o ${objects}"
+ }
+ 
+-make_tmpdir () {
+-    basetmp=${TMPDIR:-/tmp}; #honor the TMPDIR environment variable.
+-    gactmp="$basetmp/gac$$";
+-    mkdir "$gactmp" || exit 1;
+-}
++#make_tmpdir () {
++#    basetmp=${TMPDIR:-/tmp}; #honor the TMPDIR environment variable.
++#    gactmp="$basetmp/gac$$";
++#    mkdir "$gactmp" || exit 1;
++#}
+ 
+ #On systems with mktemp(1) this function is better:
+-#make_tmpdir ()
+-#{
+-#    gactmp=`mktemp -d -t "gacXXXXXXX"`;
+-#}
++make_tmpdir ()
++{
++    gactmp=`mktemp -d -t "gacXXXXXXX"`;
++}
+ 
+ #############################################################################
+ ##

@@ -1,0 +1,36 @@
+#!/bin/sh
+#
+# Script borrowed from Debian.  Thanks to the Debian packagers.
+
+set -e
+
+GAP="/usr/bin/gap"
+
+if ! test -x "$GAP"; then
+    exit 0;
+fi
+
+if test `id -u` = 0; then
+    WORKSPACE=/var/lib/gap/workspace
+else
+    WORKSPACE=$HOME/gap/workspace
+fi
+
+case $1 in
+delete) echo -n "Deleting GAP workspace $WORKSPACE.gz: "
+    rm -f $WORKSPACE.gz
+    echo "done.";;
+''|update) echo -n "Updating GAP workspace $WORKSPACE.gz: "
+    rm -f $WORKSPACE.gz
+    mkdir -p `dirname $WORKSPACE`
+    echo 'SaveWorkspace("'$WORKSPACE'");' | $GAP -q -r -R >/dev/null
+    gzip --best $WORKSPACE
+    echo "done.";;
+*)
+    echo "$0 update"
+    echo "  Update GAP workspace in $WORKSPACE.gz"
+    echo
+    echo "$0 delete"
+    echo "  Delete GAP workspace in $WORKSPACE.gz"
+    ;;
+esac

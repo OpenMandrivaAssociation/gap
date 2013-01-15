@@ -1,0 +1,5 @@
+(autoload 'gap-mode "gap-mode" "Gap editing mode" t)
+(autoload 'gap "gap-process" "Run GAP in emacs buffer" t)
+(add-to-list 'auto-mode-alist '("\\.g$" . gap-mode))
+(add-to-list 'auto-mode-alist '("\\.gap$" . gap-mode))
+(setq gap-executable "/usr/bin/gap")

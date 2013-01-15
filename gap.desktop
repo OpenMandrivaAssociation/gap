@@ -1,0 +1,11 @@
+
+[Desktop Entry]
+Name=GAP
+GenericName=Computational discrete algebra
+Comment=Groups, Algorithms, Programming
+Exec=gap %U
+Icon=/usr/share/icons/hicolor/32x32/gap.png
+Terminal=true
+Type=Application
+Categories=Education;Science;Math;
+MimeType=application/x-gap;

@@ -1,0 +1,65 @@
+				GAP for Fedora
+      Based on "GAP for Debian" by Bill Allombert <ballombe@debian.org>
+
+
+GAP (http://www.gap-system.org) is a system for computational discrete
+algebra.  Many add-on components ("packages") are available for GAP.  Most of
+them not yet available from Fedora.  However, they can be installed locally in
+any of the following locations:
+  - /usr/local/share/gap/pkg
+  - /usr/local/lib/gap/pkg
+  - ~/gap/pkg
+
+Some packages must be compiled.  The necessary tools are available in the
+gap-devel package.
+
+Saved Workspaces, or How to make GAP start faster
+-------------------------------------------------
+
+GAP starts slowly because it needs to parse all the libraries installed at
+start up.  To make GAP start faster, it is possible to save the GAP workspace
+and reload it at the next start up.  To support this, Fedora provides a
+Debian-derived script, update-gap-workspace; see the the
+update-gap-workspace(1) manual page.
+
+Colors in the GAP shell
+-----------------------
+
+If you would like the GAP shell to display the prompt, input, etc. in color,
+you can try colorprompt.g by Frank Lübeck.  Add this line to ~/.gaprc:
+
+ColorPrompt(true);
+
+See /usr/lib/gap/lib/colorprompt.g for more information.
+
+Browsing GAP Documentation
+--------------------------
+
+By default, GAP will display documentation in a terminal.  Other options are
+available.  Insert one of the following into ~/.gaprc:
+
+SetHelpViewer("firefox");   # Displays HTML documentation in Firefox
+SetHelpViewer("konqueror"); # Displays HTML documentation in Konqueror
+SetHelpViewer("lynx");      # Displays HTML documentation in Lynx
+SetHelpViewer("w3m");       # Displays HTML documentation in w3m
+SetHelpViewer("xdvi");      # Displays DVI documentation in xdvi
+SetHelpViewer("xpdf");      # Displays PDF documentation in xpdf
+SetHelpViewer("xdghtml");   # Displays HTML documentation using xdg-open
+SetHelpViewer("xdgdvi");    # Displays DVI documentation using xdg-open
+SetHelpViewer("xdgpdf");    # Displays PDF documentation using xdg-open
+
+The last three are Fedora extensions.  They use xdg-open to open the
+documentation files with the user's preferred applications.
+
+Large GAP libraries are compressed
+----------------------------------
+
+To save disk space, the largest GAP libraries are compressed with gzip.  GAP
+automatically decompresses them.
+
+Supporting GAP
+--------------
+
+If you use GAP, please send a short note to support@gap-system.org stating you
+use the Fedora packages of GAP so the GAP team can keep track of the number of
+GAP users.  This helps them obtain funding for the project.

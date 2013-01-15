@@ -1,0 +1,111 @@
+--- ./etc/emacs/gap-process.el.orig	2005-05-08 01:44:58.000000000 -0600
++++ ./etc/emacs/gap-process.el	2011-08-04 15:25:18.327841875 -0600
+@@ -337,7 +337,9 @@
+       (unwind-protect
+    (progn
+      (with-output-to-temp-buffer "*Completions*"
+-       (print-help-return-message))
++       (if (featurep 'xemacs)
++	   (print-help-return-message)
++	 (help-print-return-message)))
+      (set-process-filter process 'gap-completions-filter)
+      (process-send-string process (concat gap-completion-ident
+        "\t\t\C-x")))))))
+@@ -371,8 +373,10 @@
+     (unwind-protect
+  (progn
+    (with-output-to-temp-buffer "*Help*"
+-     (print-help-return-message))
+-          (set-process-filter process 'gap-help-filter)
++     (if (featurep 'xemacs)
++	 (print-help-return-message)
++       (help-print-return-message)))
++   (set-process-filter process 'gap-help-filter)
+    (process-send-string process (concat "?" topic "\n"))))))
+ 
+ (defun get-start-process (progm &optional name dir args startfile)
+@@ -382,17 +386,17 @@
+ containing initial standard input to process."
+   (interactive)
+   (require 'comint)
+-  (setq name (or name (file-name-nondirectory progm)))
+-  (setq buffname (concat "*" name "*"))
+-  (cond ((not (comint-check-proc buffname))
+-  (let ((buff (get-buffer-create buffname)))
+-    (set-buffer buff)
+-    (switch-to-buffer buff)
+-    (if dir (cd dir))
+-    (apply 'make-comint name progm startfile args)))
+- (t
+-  (switch-to-buffer buffname)
+-  (get-buffer buffname))))
++  (let ((name (or name (file-name-nondirectory progm)))
++	(buffname (concat "*" name "*")))
++    (cond ((not (comint-check-proc buffname))
++	   (let ((buff (get-buffer-create buffname)))
++	     (set-buffer buff)
++	     (switch-to-buffer buff)
++	     (if dir (cd dir))
++	     (apply 'make-comint name progm startfile args)))
++	  (t
++	   (switch-to-buffer buffname)
++	   (get-buffer buffname)))))
+ (defun string-strip-chars (string strip)
+   "Take STRING and remove characters in STRIP"
+   (while (> (length strip) 0)
+--- ./etc/emacs/gap-mode.el.orig	2001-08-15 10:42:16.000000000 -0600
++++ ./etc/emacs/gap-mode.el	2011-08-04 15:29:19.482725282 -0600
+@@ -89,15 +89,6 @@
+ (autoload 'gap-complete "gap-process" nil t)
+ 
+ 
+-;;! Fix member function?!
+-(defun memberequal (x y)
+-  "Like memq, but uses `equal' for comparison.
+-This is a subr in Emacs 19."
+-  (while (and y (not (equal x (car y))))
+-    (setq y (cdr y)))
+-  y)
+-
+-
+ (defvar gap-indent-brackets t
+   "* Whether to check back for unclosed brackets in determining
+ indentation level. This is good for formatting lists and matrices.")
+@@ -445,12 +436,12 @@
+                (setq name (buffer-substring (match-beginning 2) (match-end 2)))
+                (goto-char (match-end 0)))
+               (t (error "gap-insert-local-variables incorrect code!")))
+-        (if (not (memberequal name names))
++        (if (not (member name names))
+             (setq names (append names (list name))))))
+     (beginning-of-line)
+     (let (lnames)
+       (while (car names)
+-        (if (memberequal (car names) formal)
++        (if (member (car names) formal)
+             (setq names (cdr names))
+           (setq lnames (append lnames (list (car names))))
+           (setq names (cdr names))))
+@@ -527,11 +518,11 @@
+ ;;! Now the indentation functions and variables
+ ;;
+ 
+-(setq gap-end-of-statement
++(defconst gap-end-of-statement
+       (concat "\\(;\\|\\<then\\>\\|\\<else\\>\\|\\<do\\>\\|"
+ 	      "\\<repeat\\>\\|\\<function\\>.*(.*)\\)"))
+ 
+-(setq gap-increment-indentation-regexp (concat "^[ \t]*\\("
++(defconst gap-increment-indentation-regexp (concat "^[ \t]*\\("
+ 					       "if\\>"
+ 					       "\\|else\\>"
+ 					       "\\|elif\\>"
+@@ -541,7 +532,7 @@
+ 					       "\\|.*\\<function\\>"
+ 					       "\\)"))
+ 
+-(setq gap-decrement-indentation-regexp (concat "^[ \t]*\\("
++(defconst gap-decrement-indentation-regexp (concat "^[ \t]*\\("
+ 					       "fi\\>"
+ 					       "\\|od\\>"
+ 					       "\\|else\\>"

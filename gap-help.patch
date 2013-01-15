@@ -1,0 +1,44 @@
+--- ./lib/helpview.gi.orig	2012-07-13 07:32:51.000000000 -0600
++++ ./lib/helpview.gi	2012-08-14 16:35:21.977599690 -0600
+@@ -433,6 +433,27 @@ show := function(file)
+ end
+ );
+ 
++# View HTML, DVI, or PDF files with xdg-open, which opens documents with the
++# user's preferred application.
++HELP_VIEWER_INFO.xdghtml := rec(
++type := "url",
++show := function(url)
++  Exec(Concatenation("xdg-open \"", url, "\""));
++end
++);
++HELP_VIEWER_INFO.xdgdvi := rec(
++type := "dvi",
++show := function(file)
++  Exec(Concatenation("xdg-open \"", file, "\""));
++end
++);
++HELP_VIEWER_INFO.xdgpdf := rec(
++type := "pdf",
++show := function(file)
++  Exec(Concatenation("xdg-open \"", file, "\""));
++end
++);
++
+ #############################################################################
+ ##
+ #F  SetHelpViewer(<viewer>):  Set the viewer used for help
+--- ./lib/helpdef.gi.orig	2011-11-04 08:00:23.000000000 -0600
++++ ./lib/helpdef.gi	2012-08-14 16:29:28.054606842 -0600
+@@ -329,6 +329,11 @@ HELP_BOOK_HANDLER.default.ReadSix := fun
+       res.pdffile := ShallowCopy(fname);
+       Add(res.formats, "pdf");
+     fi;
++    fname{[Length(fname)-5..Length(fname)]} := "dvi.gz";
++    if IsExistingFile( fname ) = true then
++      res.dvifile := ShallowCopy(fname);
++      Add(res.formats, "dvi");
++    fi;
+   fi;
+   res.directories := Directory(fname{[1..Length(fname)-10]});  
+   return res;
