@@ -1,4 +1,4 @@
-%define bootstrap 1
+%define bootstrap 0
 %define _emacs_sitelispdir %{_datadir}/emacs/site-lisp
 %define _emacs_bytecompile %{_bindir}/emacs -batch --no-init-file --no-site-file --eval '(progn (setq load-path (cons "." load-path)))' -f batch-byte-compile
 %define _xemacs_sitelispdir %{_datadir}/xemacs/site-lisp
@@ -12,7 +12,7 @@
 
 Name:           gap
 Version:        %(echo %upstreamver | sed -r "s/r|p/./g")
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Computational discrete algebra
 
 Group:          Sciences/Mathematics
@@ -28,6 +28,8 @@ Source6:        gap.1.in
 Source7:        gac.1.in
 Source8:        update-gap-workspace.1
 Source9:        gap.vim
+# rpm5 does not understand heredoc with double %%
+Source10:       macros.gap
 # This patch from Debian rearranges some paths to match Linux conventions.
 Patch0:         %{name}-paths.patch
 # This patch applies a change from Debian to allow help files to be in gzip
@@ -219,13 +221,6 @@ find doc -name \*.dvi -o -name \*.toc | xargs gzip --best
 find -O3 small -mindepth 2 -type f | xargs gzip --best -f
 gzip --best prim/grps/*.g trans/*.grp
 
-# Create an RPM macro file for GAP packages
-cat > macros.%{name} << EOF
-%%_gap_version %{version}
-%%_gap_upstream_version %{upstreamver}
-%%_gap_dir %{gapdir}
-EOF
-
 %install
 # Get the value of the GAParch variable
 source ./sysinfo.gap
@@ -281,8 +276,8 @@ desktop-file-install --mode=644 --dir=$RPM_BUILD_ROOT%{_datadir}/applications \
   %{SOURCE4}
 
 # Install the RPM macro file
-mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/rpm
-cp -p macros.%{name} $RPM_BUILD_ROOT%{_sysconfdir}/rpm
+mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/rpm/macros.d
+cp -p %{SOURCE10} $RPM_BUILD_ROOT%{_sysconfdir}/rpm/macros.d
 
 # Install the VIM support
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/vim/vimfiles/indent
@@ -375,7 +370,7 @@ make testinstall
 %{gapdir}/src/
 %{gapdir}/tst/
 %{_mandir}/man1/gac.1*
-%config(noreplace) %{_sysconfdir}/rpm/macros.%{name}
+%config(noreplace) %{_sysconfdir}/rpm/macros.d/macros.gap
 
 %files vim
 %{gapdir}/etc/
@@ -400,6 +395,9 @@ make testinstall
 %{_xemacs_sitelispdir}/gap*.el
 
 %changelog
+* Tue Jan 15 2013 pcpa <paulo.cesar.pereira.de.andrade@gmail.com> - 4.5.7-2
+- Rebuild after bootstrap
+
 * Tue Jan 15 2013 pcpa <paulo.cesar.pereira.de.andrade@gmail.com> - 4.5.7-1
 - Import and bootstrap in openmandriva
 
