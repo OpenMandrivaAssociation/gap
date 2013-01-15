@@ -29,7 +29,7 @@ Source7:        gac.1.in
 Source8:        update-gap-workspace.1
 Source9:        gap.vim
 # rpm5 does not understand heredoc with double %%
-Source10:       macros.gap
+Source10:       gap.macros
 # This patch from Debian rearranges some paths to match Linux conventions.
 Patch0:         %{name}-paths.patch
 # This patch applies a change from Debian to allow help files to be in gzip
@@ -370,7 +370,7 @@ make testinstall
 %{gapdir}/src/
 %{gapdir}/tst/
 %{_mandir}/man1/gac.1*
-%config(noreplace) %{_sysconfdir}/rpm/macros.d/macros.gap
+%config(noreplace) %{_sysconfdir}/rpm/macros.d/gap.macros
 
 %files vim
 %{gapdir}/etc/
