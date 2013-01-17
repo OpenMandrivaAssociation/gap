@@ -1,4 +1,4 @@
-%define bootstrap 1
+%define bootstrap 0
 %define _emacs_sitelispdir %{_datadir}/emacs/site-lisp
 %define _emacs_bytecompile %{_bindir}/emacs -batch --no-init-file --no-site-file --eval '(progn (setq load-path (cons "." load-path)))' -f batch-byte-compile
 %define _xemacs_sitelispdir %{_datadir}/xemacs/site-lisp
@@ -12,7 +12,7 @@
 
 Name:           gap
 Version:        %(echo %upstreamver | sed -r "s/r|p/./g")
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Computational discrete algebra
 
 Group:          Sciences/Mathematics
