@@ -1,0 +1,170 @@
+--- ./src/integer.h.orig	2013-05-04 10:45:21.000000000 -0600
++++ ./src/integer.h	2013-05-22 11:18:27.468094940 -0600
+@@ -59,6 +59,20 @@ Obj ObjInt_Int(Int i);
+ Obj ObjInt_UInt(UInt i);
+ 
+ 
++/**************************************************************************
++** The following two functions convert a C long long or unsigned long long
++** respectively into a GAP integer, either an immediate, small integer if
++** possible or otherwise a new GAP bag with TNUM T_INTPOS or T_INTNEG.
++**
++*F ObjInt_LongLong(long long i)
++*F ObjInt_ULongLong(unsigned long long i)
++**
++****************************************************************************/
++
++Obj ObjInt_LongLong(long long i);
++Obj ObjInt_ULongLong(unsigned long long i);
++
++
+ /****************************************************************************
+ **
+ *F  PrintInt( <int> ) . . . . . . . . . . . . . . . print an integer constant
+--- ./src/integer.c.orig	2013-05-04 10:45:21.000000000 -0600
++++ ./src/integer.c	2013-05-22 11:32:58.815893606 -0600
+@@ -237,6 +237,58 @@ Obj ObjInt_UInt(UInt i)
+ }
+ 
+ 
++/**************************************************************************
++** The following two functions convert a C long long or unsigned long long
++** respectively into a GAP integer, either an immediate, small integer if
++** possible or otherwise a new GAP bag with TNUM T_INTPOS or T_INTNEG.
++**
++*F ObjInt_LongLong(long long i)
++*F ObjInt_ULongLong(unsigned long long i)
++**
++****************************************************************************/
++
++#define NDIGITS_RAW (sizeof (long long) / sizeof (TypDigit))
++#define NDIGITS (NDIGITS_RAW >= 4U ? NDIGITS_RAW : 4U)
++
++Obj ObjInt_LongLong(long long i)
++{
++    Obj n;
++    long long bound = 1LL << NR_SMALL_INT_BITS;
++    if (i >= bound) {
++        /* We have to make a big integer */
++        size_t j;
++        n = NewBag(T_INTPOS, NDIGITS);
++        for ( j = 0U; j < NDIGITS; j++ )
++            ADDR_INT(n)[j] = (TypDigit) (i >> (j * NR_DIGIT_BITS));
++        return n;
++    } else if (-i > bound) {
++        size_t j;
++        n = NewBag(T_INTNEG, NDIGITS);
++        for ( j = 0U; j < NDIGITS; j++ )
++            ADDR_INT(n)[j] = (TypDigit) ((-i) >> (j * NR_DIGIT_BITS));
++        return n;
++    } else {
++        return INTOBJ_INT((Int) i);
++    }
++}
++
++Obj ObjInt_ULongLong(unsigned long long i)
++{
++    Obj n;
++    unsigned long long bound = 1ULL << NR_SMALL_INT_BITS;
++    if (i >= bound) {
++        /* We have to make a big integer */
++        size_t j;
++        n = NewBag(T_INTPOS, NDIGITS);
++        for ( j = 0U; j < NDIGITS; j++ )
++            ADDR_INT(n)[j] = (TypDigit) (i >> (j * NR_DIGIT_BITS));
++        return n;
++    } else {
++        return INTOBJ_INT((Int) i);
++    }
++}
++
++
+ 
+ /****************************************************************************
+ **
+--- ./src/gmpints.h.orig	2013-05-04 10:45:21.000000000 -0600
++++ ./src/gmpints.h	2013-05-22 11:18:27.469094938 -0600
+@@ -79,6 +79,21 @@ typedef UInt2           TypDigit;
+ Obj ObjInt_Int(Int i);
+ Obj ObjInt_UInt(UInt i);
+ 
++
++/**************************************************************************
++** The following two functions convert a C long long or unsigned long long
++** respectively into* a GAP integer, either an immediate, small integer if
++** possible or otherwise a new GAP bag with TNUM T_INTPOS or T_INTNEG.
++**
++*F ObjInt_LongLong(long long i)
++*F ObjInt_ULongLong(unsigned long long i)
++**
++****************************************************************************/
++
++Obj ObjInt_LongLong(long long i);
++Obj ObjInt_ULongLong(unsigned long long i);
++
++
+ /****************************************************************************
+ **
+ */
+--- ./src/gmpints.c.orig	2013-05-04 10:45:21.000000000 -0600
++++ ./src/gmpints.c	2013-05-22 11:19:35.728935667 -0600
+@@ -358,6 +358,41 @@ Obj ObjInt_UInt( UInt i )
+   }
+ }
+ 
++Obj ObjInt_LongLong( long long i )
++{
++  Obj gmp;
++  unsigned long long ull;
++  size_t j;
++
++  if ( (-(1LL<<NR_SMALL_INT_BITS) <= i) && (i < 1LL<<NR_SMALL_INT_BITS ))
++    return INTOBJ_INT((Int) i);
++
++  if ( i >= 0LL ) {
++    gmp = NewBag( T_INTPOS, sizeof(i) );
++    ull = (unsigned long long) i;
++  }
++  else {
++    gmp = NewBag( T_INTNEG, sizeof(i) );
++    ull = (unsigned long long) -i;
++  }
++  for ( j = 0U; j < sizeof(i) / sizeof(TypLimb); j++ )
++    ((TypLimb *)ADDR_OBJ( gmp ))[j] = ull >> (j * sizeof(TypLimb));
++  return GMP_NORMALIZE( gmp );
++}
++
++Obj ObjInt_ULongLong( unsigned long long i )
++{
++  Obj gmp;
++  size_t j;
++
++  if ( i < 1ULL<<NR_SMALL_INT_BITS )
++    return INTOBJ_INT((Int) i);
++  gmp = NewBag( T_INTPOS, sizeof(i) );
++  for ( j = 0U; j < sizeof(i) / sizeof(TypLimb); j++ )
++    ((TypLimb *)ADDR_OBJ( gmp ))[j] = i >> (j * sizeof(TypLimb));
++  return GMP_NORMALIZE( gmp );
++}
++
+ 
+ /****************************************************************************
+ **
+--- ./src/streams.c.orig	2013-02-01 18:09:31.000000000 -0700
++++ ./src/streams.c	2013-02-20 09:32:40.123439294 -0700
+@@ -2134,13 +2134,13 @@ Obj FuncREAD_STRING_FILE (
+         struct stat fstatbuf;
+         if ( syBuf[INT_INTOBJ(fid)].pipe == 0 &&
+              fstat( syBuf[INT_INTOBJ(fid)].fp,  &fstatbuf) == 0 ) {
+-            len = fstatbuf.st_size;
++            len = (Int) fstatbuf.st_size;
+             str = NEW_STRING( len );
+             ret = read( syBuf[INT_INTOBJ(fid)].fp, 
+                         CHARS_STRING(str), len);
+             CHARS_STRING(str)[ret] = '\0';
+             SET_LEN_STRING(str, ret);
+-            if ( ret == len ) {
++            if ( (off_t) ret == fstatbuf.st_size ) {
+                  return str;
+             }
+         }

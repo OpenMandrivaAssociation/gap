@@ -4,18 +4,16 @@
 %define _xemacs_sitelispdir %{_datadir}/xemacs/site-lisp
 %define _xemacs_bytecompile %{_bindir}/xemacs -q -no-site-file -batch -eval '(push "." load-path)' -f batch-byte-compile
 
-%global upstreamver 4r5p7
-%global pkgdate 2012_12_14-17_45
-%global gapdirname gap%(echo %upstreamver | cut -dp -f1)
+%global upstreamver 4r6p4
+%global pkgdate 2013_05_04-16_36
+%global gapdirname gap%(cut -dp -f1 <<<%upstreamver)
 %global gapdir %{_prefix}/lib/gap
 %global icondir %{_datadir}/icons/hicolor
 
 Name:           gap
-Version:        %(echo %upstreamver | sed -r "s/r|p/./g")
-Release:        5%{?dist}
+Version:        %(sed -r "s/r|p/./g" <<<%upstreamver)
+Release:        1%{?dist}
 Summary:        Computational discrete algebra
-
-Group:          Sciences/Mathematics
 License:        GPLv2+
 URL:            http://www.gap-system.org/
 Source0:        ftp://ftp.gap-system.org/pub/gap/gap4/tar.bz2/%{name}%{upstreamver}_%{pkgdate}.tar.bz2
@@ -42,6 +40,9 @@ Patch2:         %{name}-env.patch
 # This patch was sent upstream 4 Aug 2011.  It fixes some cosmetic issues in
 # the Emacs Lisp sources.
 Patch3:         %{name}-emacs.patch
+# This patch will not be sent upstream.  Force use of the 64-bit stat()
+# routines to avoid overflow of the inode and size fields.
+Patch4:         %{name}-stat.patch
 
 BuildRequires:  desktop-file-utils
 BuildRequires:  gmp-devel
@@ -70,7 +71,6 @@ This is a metapackage that requires the standard GAP components.
 
 %package libs
 Summary:        Essential GAP libraries
-Group:          Sciences/Mathematics
 BuildArch:      noarch
 
 Provides:       %{name}-prim-groups = %{version}-%{release}
@@ -83,7 +83,6 @@ the primitive, small, and transitive group databases.
 
 %package core
 Summary:        GAP core components
-Group:          Sciences/Mathematics
 Requires:       %{name}-libs = %{version}-%{release}
 %if !%{bootstrap}
 Requires:       GAPDoc
@@ -97,7 +96,6 @@ This package contains the core GAP system.
 
 %package online-help
 Summary:        Online help for GAP
-Group:          Sciences/Mathematics
 Requires:       %{name}-core = %{version}-%{release}
 BuildArch:      noarch
 
@@ -107,7 +105,6 @@ online help system.
 
 %package devel
 Summary:        GAP compiler and development files
-Group:          Development/Other
 Requires:       %{name}-core%{?isa} = %{version}-%{release}
 Requires:       gcc
 Requires:       gmp-devel%{?_isa}
@@ -118,7 +115,6 @@ for developing GAP programs.
 
 %package vim
 Summary:        Edit GAP files with VIM
-Group:          Sciences/Mathematics
 Requires:       %{name}-core = %{version}-%{release}, vim-enhanced
 BuildArch:      noarch
 
@@ -128,7 +124,6 @@ Both syntax highlighting and indentation are supported.
 
 %package emacs
 Summary:        Edit GAP files with Emacs
-Group:          Sciences/Mathematics
 Requires:       %{name}-core = %{version}-%{release}
 Requires:       emacs
 BuildArch:      noarch
@@ -139,7 +134,6 @@ and running GAP from within Emacs.
 
 %package emacs-el
 Summary:        Emacs Lisp source files for GAP
-Group:          Sciences/Mathematics
 Requires:       %{name}-emacs = %{version}-%{release}
 BuildArch:      noarch
 
@@ -149,7 +143,6 @@ GAP Emacs support.
 
 %package xemacs
 Summary:        Edit GAP files with XEmacs
-Group:          Sciences/Mathematics
 Requires:       %{name}-core = %{version}-%{release}
 Requires:       xemacs
 BuildArch:      noarch
@@ -160,7 +153,6 @@ and running GAP from within XEmacs.
 
 %package xemacs-el
 Summary:        XEmacs Lisp source files for GAP
-Group:          Sciences/Mathematics
 Requires:       %{name}-xemacs = %{version}-%{release}
 BuildArch:      noarch
 
@@ -174,6 +166,7 @@ GAP XEmacs support.
 %patch1
 %patch2
 %patch3
+%patch4
 
 # Replace the CFLAGS, find the math functions and sigsetjmp
 sed -re "s|(gp_cv_prog_cc_cdynoptions=)\"-fpic -Wall -O2|\1\"\$RPM_OPT_FLAGS -fPIC -D_GNU_SOURCE -DSYS_DEFAULT_PATHS='\"%{gapdir}\"'|" \
@@ -196,7 +189,7 @@ chmod a+x makepkgs
 
 %build
 %configure --with-gmp=system \
-  CFLAGS='%{optflags} -D_GNU_SOURCE -DSYS_DEFAULT_PATHS=\"%{gapdir}\"'
+  CPPFLAGS='-D_FILE_OFFSET_BITS=64 -DSYS_DEFAULT_PATHS=\"%{gapdir}\"'
 # FIXME: GAP 4.5 broke %%{?_smp_mflags}
 make
 
@@ -315,10 +308,10 @@ cp -p %{SOURCE8} $RPM_BUILD_ROOT%{_mandir}/man1
 update-desktop-database %{_datadir}/applications &>/dev/null ||:
 update-mime-database %{_datadir}/mime &>/dev/null ||:
 touch --no-create %{icondir} >&/dev/null ||:
-%{_bindir}/update-gap-workspace ||:
 
 %posttrans
 %{_bindir}/gtk-update-icon-cache %{icondir} >&/dev/null ||:
+%{_bindir}/update-gap-workspace ||:
 
 %postun core
 update-desktop-database %{_datadir}/applications &>/dev/null ||:
@@ -393,55 +386,3 @@ make testinstall
 
 %files xemacs-el
 %{_xemacs_sitelispdir}/gap*.el
-
-%changelog
-* Tue Jan 15 2013 pcpa <paulo.cesar.pereira.de.andrade@gmail.com> - 4.5.7-3
-- Correct version in macros.gap
-
-* Tue Jan 15 2013 pcpa <paulo.cesar.pereira.de.andrade@gmail.com> - 4.5.7-2
-- Rebuild after bootstrap
-
-* Tue Jan 15 2013 pcpa <paulo.cesar.pereira.de.andrade@gmail.com> - 4.5.7-1
-- Import and bootstrap in openmandriva
-
-* Fri Dec 21 2012 Rex Dieter <rdieter@fedoraproject.org> 4.5.7-2
-- optimize/update icon scriptlets
-
-* Mon Dec 17 2012 Jerry James <loganjerry@gmail.com> - 4.5.7-1
-- New upstream release
-
-* Mon Oct 22 2012 Jerry James <loganjerry@gmail.com> - 4.5.6-3
-- Further fixes for the -m32/-m64 issue
-- Many packages need the primitive, small, or transitive groups; collapse them
-  all into the -libs subpackage so they are always available
-- Provide sysinfo-default[32|64], as required by some packages
-- Provide symbolic links to gac and gap from the bin directory, as required by
-  some packages
-
-* Sat Oct 20 2012 Peter Robinson <pbrobinson@fedoraproject.org>	4.5.6-2
-- -m32/-m64 should come from RPM_OPT_FLAGS. Fix build issues on non x86 arches
-
-* Mon Sep 24 2012 Jerry James <loganjerry@gmail.com> - 4.5.6-1
-- New upstream release
-- Remove unused patches from git
-
-* Thu Sep 13 2012 Jerry James <loganjerry@gmail.com> - 4.5.5-1
-- New upstream release
-- Drop upstreamed patches
-- Sources are now UTF-8; no conversion necessary
-
-* Thu Jul 19 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 4.4.12-5
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
-
-* Tue Jan 31 2012 Jerry James <loganjerry@gmail.com> - 4.4.12-4
-- Add an RPM macro file for GAP packages
-- Fix the location of config.h
-
-* Wed Jan 11 2012 Jerry James <loganjerry@gmail.com> - 4.4.12-3
-- Fix problems found on review
-
-* Tue Jan  3 2012 Jerry James <loganjerry@gmail.com> - 4.4.12-2
-- Mimic Debian's subpackage structure
-
-* Wed Oct 12 2011 Jerry James <loganjerry@gmail.com> - 4.4.12-1
-- Initial RPM
