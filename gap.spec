@@ -13,7 +13,7 @@
 
 Name:           gap
 Version:        %(sed -r "s/r|p/./g" <<<%upstreamver)
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Computational discrete algebra
 License:        GPLv2+
 URL:            http://www.gap-system.org/
@@ -227,6 +227,7 @@ source ./sysinfo.gap
 mkdir -p $RPM_BUILD_ROOT%{_bindir}
 cp -p bin/$GAParch/{gac,gap} $RPM_BUILD_ROOT%{_bindir}
 cp -p %{SOURCE2} $RPM_BUILD_ROOT%{_bindir}
+chmod +x $RPM_BUILD_ROOT%{_bindir}/update-gap-workspace
 
 # Install the data
 mkdir -p $RPM_BUILD_ROOT%{gapdir}/etc
