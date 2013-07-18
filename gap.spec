@@ -1,3 +1,4 @@
+%define with_xemacs	0
 %define bootstrap 0
 %define _emacs_sitelispdir %{_datadir}/emacs/site-lisp
 %define _emacs_bytecompile %{_bindir}/emacs -batch --no-init-file --no-site-file --eval '(progn (setq load-path (cons "." load-path)))' -f batch-byte-compile
@@ -12,7 +13,7 @@
 
 Name:           gap
 Version:        %(sed -r "s/r|p/./g" <<<%upstreamver)
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Computational discrete algebra
 License:        GPLv2+
 URL:            http://www.gap-system.org/
@@ -44,12 +45,14 @@ Patch3:         %{name}-emacs.patch
 # routines to avoid overflow of the inode and size fields.
 Patch4:         %{name}-stat.patch
 
+BuildRequires:  emacs
 BuildRequires:  desktop-file-utils
 BuildRequires:  gmp-devel
 BuildRequires:  netpbm
 BuildRequires:  readline-devel
-BuildRequires:  emacs
+%if %{with_xemacs}
 BuildRequires:  xemacs
+%endif
 Obsoletes:      gap-system <= 4.4.12
 Obsoletes:      gap-system-packages <= 4.4.12
 
@@ -141,6 +144,7 @@ BuildArch:      noarch
 Emacs Lisp source files for GAP.  This package is not needed to use the
 GAP Emacs support.
 
+%if %{with_xemacs}
 %package xemacs
 Summary:        Edit GAP files with XEmacs
 Requires:       %{name}-core = %{version}-%{release}
@@ -159,6 +163,7 @@ BuildArch:      noarch
 %description xemacs-el
 XEmacs Lisp source files for GAP.  This package is not needed to use the
 GAP XEmacs support.
+%endif
 
 %prep
 %setup -q -n %{gapdirname}
@@ -289,6 +294,7 @@ popd
 mkdir -p $RPM_BUILD_ROOT%{_emacs_sitestartdir}
 cp -p %{SOURCE5} $RPM_BUILD_ROOT%{_emacs_sitestartdir}
 
+%if %{with_xemacs}
 # Install the XEmacs support
 mkdir -p $RPM_BUILD_ROOT%{_xemacs_sitelispdir}
 cp -p etc/emacs/gap*.el $RPM_BUILD_ROOT%{_xemacs_sitelispdir}
@@ -297,6 +303,7 @@ pushd $RPM_BUILD_ROOT%{_xemacs_sitelispdir}
 popd
 mkdir -p $RPM_BUILD_ROOT%{_xemacs_sitestartdir}
 cp -p %{SOURCE5} $RPM_BUILD_ROOT%{_xemacs_sitestartdir}
+%endif
 
 # Install the man pages
 mkdir -p $RPM_BUILD_ROOT%{_mandir}/man1
@@ -379,6 +386,7 @@ make testinstall
 %files emacs-el
 %{_emacs_sitelispdir}/gap*.el
 
+%if %{with_xemacs}
 %files xemacs
 %doc etc/emacs/gap-mode.doc
 %{_xemacs_sitelispdir}/gap*.elc
@@ -386,3 +394,4 @@ make testinstall
 
 %files xemacs-el
 %{_xemacs_sitelispdir}/gap*.el
+%endif
