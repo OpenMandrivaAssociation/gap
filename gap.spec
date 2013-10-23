@@ -5,15 +5,15 @@
 %define _xemacs_sitelispdir %{_datadir}/xemacs/site-lisp
 %define _xemacs_bytecompile %{_bindir}/xemacs -q -no-site-file -batch -eval '(push "." load-path)' -f batch-byte-compile
 
-%global upstreamver 4r6p4
-%global pkgdate 2013_05_04-16_36
+%global upstreamver 4r6p5
+%global pkgdate 2013_07_20-20_02
 %global gapdirname gap%(cut -dp -f1 <<<%upstreamver)
 %global gapdir %{_prefix}/lib/gap
 %global icondir %{_datadir}/icons/hicolor
 
 Name:           gap
 Version:        %(sed -r "s/r|p/./g" <<<%upstreamver)
-Release:        3%{?dist}
+Release:        1%{?dist}
 Summary:        Computational discrete algebra
 License:        GPLv2+
 URL:            http://www.gap-system.org/
@@ -174,8 +174,8 @@ GAP XEmacs support.
 %patch4
 
 # Replace the CFLAGS, find the math functions and sigsetjmp
-sed -re "s|(gp_cv_prog_cc_cdynoptions=)\"-fpic -Wall -O2|\1\"\$RPM_OPT_FLAGS -fPIC -D_GNU_SOURCE -DSYS_DEFAULT_PATHS='\"%{gapdir}\"'|" \
-    -e "s|(gp_cv_prog_cc_cdynlinking=)\"-shared -g|\1\"\$RPM_OPT_FLAGS -shared|" \
+sed -re "s|(gp_cv_prog_cc_cdynoptions=)\"-fpic -Wall -O2|\1\"\$RPM_OPT_FLAGS -fPIC -D_FILE_OFFSET_BITS=64 -DSYS_DEFAULT_PATHS='\"%{gapdir}\"'|" \
+    -e "s|(gp_cv_prog_cc_cdynlinking=)\"-shared -g|\1\"\$RPM_LD_FLAGS -shared|" \
     -e '/log2 log10/iLIBS="-lm $LIBS"' \
     -e "/sigsetjmp/,\$s|(ac_fn_c_check_func.*)ac_func(.*)|\1{ac_func/sigsetjmp/__sigsetjmp}\2|" \
     -i cnf/configure.out
