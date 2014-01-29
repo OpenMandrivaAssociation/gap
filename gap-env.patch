@@ -1,6 +1,6 @@
---- ./src/system.c.orig	2013-05-04 10:45:21.000000000 -0600
-+++ ./src/system.c	2013-05-16 09:04:06.568959420 -0600
-@@ -1754,6 +1754,7 @@ void InitSystem (
+--- ./src/system.c.orig	2013-12-01 03:27:41.000000000 -0700
++++ ./src/system.c	2014-01-13 22:00:00.000000000 -0700
+@@ -1757,6 +1757,7 @@ void InitSystem (
      Char *              argv [] )
  {
      Char *              *ptrlist;
@@ -8,7 +8,7 @@
      UInt                i;             /* loop variable                   */
      Int res;                       /* return from option processing function */
  
-@@ -1877,6 +1878,16 @@ void InitSystem (
+@@ -1880,6 +1881,16 @@ void InitSystem (
  
  #endif
  

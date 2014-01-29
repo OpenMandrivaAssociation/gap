@@ -1,6 +1,20 @@
---- ./lib/helpview.gi.orig	2012-07-13 07:32:51.000000000 -0600
-+++ ./lib/helpview.gi	2012-08-14 16:35:21.977599690 -0600
-@@ -433,6 +433,27 @@ show := function(file)
+--- ./lib/helpdef.gi.orig	2013-12-01 03:17:14.000000000 -0700
++++ ./lib/helpdef.gi	2014-01-13 22:00:00.000000000 -0700
+@@ -329,6 +329,11 @@ HELP_BOOK_HANDLER.default.ReadSix := fun
+       res.pdffile := ShallowCopy(fname);
+       Add(res.formats, "pdf");
+     fi;
++    fname{[Length(fname)-5..Length(fname)]} := "dvi.gz";
++    if IsExistingFile( fname ) = true then
++      res.dvifile := ShallowCopy(fname);
++      Add(res.formats, "dvi");
++    fi;
+   fi;
+   res.directories := Directory(fname{[1..Length(fname)-10]});  
+   return res;
+--- ./lib/helpview.gi.orig	2013-12-01 03:17:14.000000000 -0700
++++ ./lib/helpview.gi	2014-01-13 22:00:00.000000000 -0700
+@@ -430,6 +430,27 @@ show := function(file)
  end
  );
  
@@ -28,17 +42,3 @@
  #############################################################################
  ##
  #F  SetHelpViewer(<viewer>):  Set the viewer used for help
---- ./lib/helpdef.gi.orig	2011-11-04 08:00:23.000000000 -0600
-+++ ./lib/helpdef.gi	2012-08-14 16:29:28.054606842 -0600
-@@ -329,6 +329,11 @@ HELP_BOOK_HANDLER.default.ReadSix := fun
-       res.pdffile := ShallowCopy(fname);
-       Add(res.formats, "pdf");
-     fi;
-+    fname{[Length(fname)-5..Length(fname)]} := "dvi.gz";
-+    if IsExistingFile( fname ) = true then
-+      res.dvifile := ShallowCopy(fname);
-+      Add(res.formats, "dvi");
-+    fi;
-   fi;
-   res.directories := Directory(fname{[1..Length(fname)-10]});  
-   return res;

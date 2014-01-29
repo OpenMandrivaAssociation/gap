@@ -1,12 +1,5 @@
-%define with_xemacs	0
-%define bootstrap 0
-%define _emacs_sitelispdir %{_datadir}/emacs/site-lisp
-%define _emacs_bytecompile %{_bindir}/emacs -batch --no-init-file --no-site-file --eval '(progn (setq load-path (cons "." load-path)))' -f batch-byte-compile
-%define _xemacs_sitelispdir %{_datadir}/xemacs/site-lisp
-%define _xemacs_bytecompile %{_bindir}/xemacs -q -no-site-file -batch -eval '(push "." load-path)' -f batch-byte-compile
-
-%global upstreamver 4r6p5
-%global pkgdate 2013_07_20-20_02
+%global upstreamver 4r7p2
+%global pkgdate 2013_12_01-10_17
 %global gapdirname gap%(cut -dp -f1 <<<%upstreamver)
 %global gapdir %{_prefix}/lib/gap
 %global icondir %{_datadir}/icons/hicolor
@@ -17,7 +10,7 @@ Release:        1%{?dist}
 Summary:        Computational discrete algebra
 License:        GPLv2+
 URL:            http://www.gap-system.org/
-Source0:        ftp://ftp.gap-system.org/pub/gap/gap4/tar.bz2/%{name}%{upstreamver}_%{pkgdate}.tar.bz2
+Source0:        ftp://ftp.gap-system.org/pub/gap/gap47/tar.bz2/%{name}%{upstreamver}_%{pkgdate}.tar.bz2
 Source1:        gap-README.fedora
 Source2:        update-gap-workspace
 Source3:        gap.xml
@@ -38,21 +31,14 @@ Patch1:         %{name}-help.patch
 # environment variables now read by gap.sh, so we can dispose of the shell
 # script and run the actual binary directly.
 Patch2:         %{name}-env.patch
-# This patch was sent upstream 4 Aug 2011.  It fixes some cosmetic issues in
-# the Emacs Lisp sources.
-Patch3:         %{name}-emacs.patch
 # This patch will not be sent upstream.  Force use of the 64-bit stat()
 # routines to avoid overflow of the inode and size fields.
-Patch4:         %{name}-stat.patch
+Patch3:         %{name}-stat.patch
 
-BuildRequires:  emacs
 BuildRequires:  desktop-file-utils
 BuildRequires:  gmp-devel
 BuildRequires:  netpbm
 BuildRequires:  readline-devel
-%if %{with_xemacs}
-BuildRequires:  xemacs
-%endif
 Obsoletes:      gap-system <= 4.4.12
 Obsoletes:      gap-system-packages <= 4.4.12
 
@@ -76,9 +62,16 @@ This is a metapackage that requires the standard GAP components.
 Summary:        Essential GAP libraries
 BuildArch:      noarch
 
-Provides:       %{name}-prim-groups = %{version}-%{release}
-Provides:       %{name}-small-groups = %{version}-%{release}
-Provides:       %{name}-trans-groups = %{version}-%{release}
+# These obsoletes and provides can be removed once Fedora 20 is EOL, or if
+# somebody packages one of the GAP emacs interfaces.
+Obsoletes:      %{name}-emacs < 4.7.2-1
+Provides:       %{name}-emacs = %{version}-%{release}
+Obsoletes:      %{name}-emacs-el < 4.7.2-1
+Provides:       %{name}-emacs-el = %{version}-%{release}
+Obsoletes:      %{name}-xemacs < 4.7.2-1
+Provides:       %{name}-xemacs = %{version}-%{release}
+Obsoletes:      %{name}-xemacs-el < 4.7.2-1
+Provides:       %{name}-xemacs-el = %{version}-%{release}
 
 %description libs
 This package contains the essential GAP libraries: lib and grp, as well as
@@ -87,9 +80,7 @@ the primitive, small, and transitive group databases.
 %package core
 Summary:        GAP core components
 Requires:       %{name}-libs = %{version}-%{release}
-%if !%{bootstrap}
 Requires:       GAPDoc
-%endif
 # The gap binary executes gunzip
 Requires:       gzip
 Requires:       hicolor-icon-theme
@@ -125,66 +116,22 @@ BuildArch:      noarch
 This package provides VIM add-on files to support editing GAP sources.
 Both syntax highlighting and indentation are supported.
 
-%package emacs
-Summary:        Edit GAP files with Emacs
-Requires:       %{name}-core = %{version}-%{release}
-Requires:       emacs
-BuildArch:      noarch
-
-%description emacs
-This package provides Emacs add-on files to support editing GAP sources
-and running GAP from within Emacs.
-
-%package emacs-el
-Summary:        Emacs Lisp source files for GAP
-Requires:       %{name}-emacs = %{version}-%{release}
-BuildArch:      noarch
-
-%description emacs-el
-Emacs Lisp source files for GAP.  This package is not needed to use the
-GAP Emacs support.
-
-%if %{with_xemacs}
-%package xemacs
-Summary:        Edit GAP files with XEmacs
-Requires:       %{name}-core = %{version}-%{release}
-Requires:       xemacs
-BuildArch:      noarch
-
-%description xemacs
-This package provides XEmacs add-on files to support editing GAP sources
-and running GAP from within XEmacs.
-
-%package xemacs-el
-Summary:        XEmacs Lisp source files for GAP
-Requires:       %{name}-xemacs = %{version}-%{release}
-BuildArch:      noarch
-
-%description xemacs-el
-XEmacs Lisp source files for GAP.  This package is not needed to use the
-GAP XEmacs support.
-%endif
-
 %prep
 %setup -q -n %{gapdirname}
 %patch0
 %patch1
 %patch2
 %patch3
-%patch4
 
-# Replace the CFLAGS, find the math functions and sigsetjmp
+# Replace the CFLAGS and find the math functions
 sed -re "s|(gp_cv_prog_cc_cdynoptions=)\"-fpic -Wall -O2|\1\"\$RPM_OPT_FLAGS -fPIC -D_FILE_OFFSET_BITS=64 -DSYS_DEFAULT_PATHS='\"%{gapdir}\"'|" \
-    -e "s|(gp_cv_prog_cc_cdynlinking=)\"-shared -g|\1\"\$RPM_LD_FLAGS -shared|" \
+    -e "s|(gp_cv_prog_cc_cdynlinking=)\"-shared -g[[:digit:]]*|\1\"\$RPM_LD_FLAGS -shared|" \
     -e '/log2 log10/iLIBS="-lm $LIBS"' \
-    -e "/sigsetjmp/,\$s|(ac_fn_c_check_func.*)ac_func(.*)|\1{ac_func/sigsetjmp/__sigsetjmp}\2|" \
     -i cnf/configure.out
 
 # The -m32 and -m64 flags are not available on all platforms, and we provide
 # them in optflags when they are needed.
-sed -e 's/GMP_CFLAGS="-m${ABI}"/GMP_CFLAGS=""/' \
-    -e 's/ABI_CFLAGS="-m[[:digit:]]*"/ABI_CFLAGS=""/' \
-    -i configure
+sed -i 's/ABI_CFLAGS="-m[[:digit:]]*"/ABI_CFLAGS=""/' configure
 
 # Get the README
 cp -p %{SOURCE1} README.fedora
@@ -286,26 +233,6 @@ cp -p etc/gap.vim $RPM_BUILD_ROOT%{_datadir}/vim/vimfiles/syntax
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/vim/vimfiles/ftdetect
 cp -p %{SOURCE9}  $RPM_BUILD_ROOT%{_datadir}/vim/vimfiles/ftdetect
 
-# Install the Emacs support
-mkdir -p $RPM_BUILD_ROOT%{_emacs_sitelispdir}
-cp -p etc/emacs/gap*.el $RPM_BUILD_ROOT%{_emacs_sitelispdir}
-pushd $RPM_BUILD_ROOT%{_emacs_sitelispdir}
-%{_emacs_bytecompile} gap*.el
-popd
-mkdir -p $RPM_BUILD_ROOT%{_emacs_sitestartdir}
-cp -p %{SOURCE5} $RPM_BUILD_ROOT%{_emacs_sitestartdir}
-
-%if %{with_xemacs}
-# Install the XEmacs support
-mkdir -p $RPM_BUILD_ROOT%{_xemacs_sitelispdir}
-cp -p etc/emacs/gap*.el $RPM_BUILD_ROOT%{_xemacs_sitelispdir}
-pushd $RPM_BUILD_ROOT%{_xemacs_sitelispdir}
-%{_xemacs_bytecompile} gap*.el
-popd
-mkdir -p $RPM_BUILD_ROOT%{_xemacs_sitestartdir}
-cp -p %{SOURCE5} $RPM_BUILD_ROOT%{_xemacs_sitestartdir}
-%endif
-
 # Install the man pages
 mkdir -p $RPM_BUILD_ROOT%{_mandir}/man1
 sed "s|@VERSION@|%{version}|" %{SOURCE6} > $RPM_BUILD_ROOT%{_mandir}/man1/gap.1
@@ -378,21 +305,3 @@ make testinstall
 %{_datadir}/vim/vimfiles/ftdetect/gap.vim
 %{_datadir}/vim/vimfiles/indent/gap_indent.vim
 %{_datadir}/vim/vimfiles/syntax/gap.vim
-
-%files emacs
-%doc etc/emacs/gap-mode.doc
-%{_emacs_sitelispdir}/gap*.elc
-%{_emacs_sitestartdir}/gap.el
-
-%files emacs-el
-%{_emacs_sitelispdir}/gap*.el
-
-%if %{with_xemacs}
-%files xemacs
-%doc etc/emacs/gap-mode.doc
-%{_xemacs_sitelispdir}/gap*.elc
-%{_xemacs_sitestartdir}/gap.el
-
-%files xemacs-el
-%{_xemacs_sitelispdir}/gap*.el
-%endif

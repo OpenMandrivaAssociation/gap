@@ -1,16 +1,5 @@
---- ./configure.orig	2012-05-21 08:42:52.000000000 -0600
-+++ ./configure	2012-08-15 14:00:11.360607877 -0600
-@@ -4073,7 +4073,7 @@ $as_echo "no" >&6; }
- fi
- 
- 
--gapdir=`pwd`
-+gapdir=/usr/lib/gap
- 
- 
- 
---- ./cnf/gac.in.orig	2013-05-04 10:36:28.000000000 -0600
-+++ ./cnf/gac.in	2013-05-16 09:00:16.226661866 -0600
+--- ./cnf/gac.in.orig	2013-12-01 03:17:13.000000000 -0700
++++ ./cnf/gac.in	2014-01-13 22:00:00.000000000 -0700
 @@ -55,16 +55,16 @@
  ##  option is appended at the end of the link command after the .o
  ##  files to link.
@@ -32,7 +21,7 @@
  fi
  gap_options=""
  gap_include="${gap_dir}/src"
-@@ -119,9 +119,9 @@ gap_compile () {
+@@ -171,9 +171,9 @@ gap_compile () {
  ##
  c_compile () {
      echo ${c_compiler}  $3 -o $1 -I${gap_dir} \
@@ -44,7 +33,7 @@
  }
  
  
-@@ -387,17 +387,17 @@ make_compstat () {
+@@ -439,17 +439,17 @@ make_compstat () {
      objects="${gactmp}/$$compstat.o ${objects}"
  }
  
@@ -71,3 +60,14 @@
  
  #############################################################################
  ##
+--- ./configure.orig	2013-12-01 03:17:13.000000000 -0700
++++ ./configure	2014-01-13 22:00:00.000000000 -0700
+@@ -4094,7 +4094,7 @@ $as_echo "no" >&6; }
+ fi
+ 
+ 
+-gapdir=`pwd`
++gapdir=/usr/lib/gap
+ 
+ 
+ 
