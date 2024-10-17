@@ -9,7 +9,7 @@ Version:        %(sed -r "s/r|p/./g" <<<%upstreamver)
 Release:        1%{?dist}
 Summary:        Computational discrete algebra
 License:        GPLv2+
-URL:            http://www.gap-system.org/
+URL:            https://www.gap-system.org/
 Source0:        ftp://ftp.gap-system.org/pub/gap/gap47/tar.bz2/%{name}%{upstreamver}_%{pkgdate}.tar.bz2
 Source1:        gap-README.fedora
 Source2:        update-gap-workspace
