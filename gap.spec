@@ -35,6 +35,11 @@ Patch2:         %{name}-env.patch
 # routines to avoid overflow of the inode and size fields.
 Patch3:         %{name}-stat.patch
 
+BuildRequires:	autoconf
+BuildRequires:	automake
+BuildRequires:	libtool-base
+BuildRequires:	slibtool
+BuildRequires:	make
 BuildRequires:  desktop-file-utils
 BuildRequires:  gmp-devel
 BuildRequires:  netpbm
